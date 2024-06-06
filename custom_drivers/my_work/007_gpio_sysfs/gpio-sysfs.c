@@ -33,6 +33,32 @@ struct of_device_id gpio_device_match[] =
 
 int gpio_sysfs_probe(struct platform_device *pdev)
 {
+	struct device *dev = &pdev->dev;
+	struct device_node * parent = pdev->dev.of_node;
+	struct device_node * child = NULL;
+	struct gpiodev_private_data *dev_data;
+
+	const char *name;
+	int i = 0;
+
+	for_each_available_child_of_node(parent, child)
+	{
+		dev_data = devm_kzalloc(dev, sizeof(*dev_data), GFP_KERNEL);
+
+		if (!dev_data) {
+			dev_err(dev, "Cannot allocate memory\n");
+			return -ENOMEM;
+		}
+
+		if (of_property_read_string(child, "label", &name))
+		{
+			dev_warn(dev, "Missing label information");
+			snprintf(dev_data->label, sizeof(dev_data->label), "unkngpio%d", i++);
+		} else {
+			strcpy(dev_data->label, name);
+			dev_info(dev, "gpio label = %s\n", dev_data->label);
+		}
+	}
 	return 0;
 }
 
