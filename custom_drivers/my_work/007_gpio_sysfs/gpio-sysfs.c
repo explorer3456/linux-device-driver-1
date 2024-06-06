@@ -22,5 +22,5 @@ struct gpiodrv_private_data
 };
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Kiran Nayak");
-MODULE_DESCRIPTION("A pseudo character platform driver which handles n platform pcdevs");
+MODULE_AUTHOR("jhkim");
+MODULE_DESCRIPTION("A simple gpio sysfs driver");
