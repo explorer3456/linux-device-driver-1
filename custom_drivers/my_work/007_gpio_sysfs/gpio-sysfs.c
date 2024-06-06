@@ -31,10 +31,20 @@ struct of_device_id gpio_device_match[] =
 	{}
 };
 
+int gpio_sysfs_probe(struct platform_device *pdev)
+{
+	return 0;
+}
+
+int gpio_sysfs_remove(struct platform_device *pdev)
+{
+	return 0;
+}
+
 struct platform_driver gpiosysfs_platform_driver = 
 {
 	.probe = gpio_sysfs_probe,
-	.remove = pgio_sysfs_remove,
+	.remove = gpio_sysfs_remove,
 	.driver = {
 		.name = "bone-gpio-sysfs",
 		.of_match_table = of_match_ptr(gpio_device_match),
@@ -62,6 +72,9 @@ void __exit gpio_sysfs_exit(void)
 	platform_driver_unregister(&gpiosysfs_platform_driver);
 	class_destroy(gpio_drv_data.class_gpio);
 }
+
+module_init(gpio_sysfs_init);
+module_exit(gpio_sysfs_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("jhkim");
