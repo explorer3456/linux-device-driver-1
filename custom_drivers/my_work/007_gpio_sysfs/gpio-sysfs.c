@@ -21,6 +21,20 @@ struct gpiodrv_private_data
 	struct class *class_gpio;
 };
 
+struct gpiodrv_private_data gpio_drv_data;
+
+static int __init gpio_sysfs_init(void)
+{
+	gpio_drv_data.class_gpio = class_create(THIS_MODULE, "bone_gpios");
+	if (IS_ERR(gpio_drv_data.class_gpio)) {
+		pr_err("Error in creating class \n");
+		return PTR_ERR(gpio_drv_data.class_gpio);
+	}
+	pr_info("module load success\n");
+
+	return 0;
+}
+
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("jhkim");
 MODULE_DESCRIPTION("A simple gpio sysfs driver");
