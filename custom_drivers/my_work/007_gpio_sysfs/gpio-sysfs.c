@@ -23,6 +23,25 @@ struct gpiodrv_private_data
 
 struct gpiodrv_private_data gpio_drv_data;
 
+struct of_device_id gpio_device_match[] =
+{
+	{
+		.compatible = "org,bone-gpio-sysfs"
+	},
+	{}
+};
+
+struct platform_driver gpiosysfs_platform_driver = 
+{
+	.probe = gpio_sysfs_probe,
+	.remove = pgio_sysfs_remove,
+	.driver = {
+		.name = "bone-gpio-sysfs",
+		.of_match_table = of_match_ptr(gpio_device_match),
+	},
+
+};
+
 static int __init gpio_sysfs_init(void)
 {
 	gpio_drv_data.class_gpio = class_create(THIS_MODULE, "bone_gpios");
@@ -30,9 +49,18 @@ static int __init gpio_sysfs_init(void)
 		pr_err("Error in creating class \n");
 		return PTR_ERR(gpio_drv_data.class_gpio);
 	}
+
+	platform_driver_register(&gpiosysfs_platform_driver);
+
 	pr_info("module load success\n");
 
 	return 0;
+}
+
+void __exit gpio_sysfs_exit(void)
+{
+	platform_driver_unregister(&gpiosysfs_platform_driver);
+	class_destroy(gpio_drv_data.class_gpio);
 }
 
 MODULE_LICENSE("GPL");
