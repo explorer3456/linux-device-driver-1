@@ -11,6 +11,31 @@
 #include<linux/of_device.h>
 #include <linux/gpio/consumer.h>
 
+static direction_show(struct device *dev, struct device_attribute *attr, char *buf)
+{
+	return 0;
+}
+
+static direction_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
+{
+	return 0;
+}
+
+static value_show(struct device *dev, struct device_attribute *attr, char *buf)
+{
+	return 0;
+}
+
+static value_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
+{
+	return 0;
+}
+
+static label_show(struct device *dev, struct device_attribute *attr, char *buf)
+{
+	return 0;
+}
+
 struct gpiodev_private_data
 {
 	char label[20];
@@ -25,6 +50,7 @@ struct gpiodrv_private_data
 
 struct gpiodrv_private_data gpio_drv_data;
 
+
 struct of_device_id gpio_device_match[] =
 {
 	{
@@ -32,6 +58,11 @@ struct of_device_id gpio_device_match[] =
 	},
 	{}
 };
+
+
+static DEVICE_ATTR_RW(direction);
+static DEVICE_ATTR_RW(value);
+static DEVICE_ATTR_RO(label);
 
 int gpio_sysfs_probe(struct platform_device *pdev)
 {
