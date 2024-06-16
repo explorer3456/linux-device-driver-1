@@ -42,6 +42,7 @@ int gpio_sysfs_probe(struct platform_device *pdev)
 
 	const char *name;
 	int i = 0;
+	int ret;
 
 	for_each_available_child_of_node(parent, child)
 	{
@@ -63,6 +64,14 @@ int gpio_sysfs_probe(struct platform_device *pdev)
 
 		dev_data->desc = devm_fwnode_get_gpiod_from_child(dev, "bone", &child->fwnode, \
 				GPIOD_ASIS, dev_data->label);
+
+		if (IS_ERR(dev_data->desc)) {
+			ret = PTR_ERR(dev_data->desc);
+			if (ret == -ENOENT) 
+				dev_err(dev, "No GPIO has been assigned\n");
+
+			return ret;
+		}
 
 		i++;
 
