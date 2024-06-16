@@ -9,10 +9,12 @@
 #include<linux/mod_devicetable.h>
 #include<linux/of.h>
 #include<linux/of_device.h>
+#include <linux/gpio/consumer.h>
 
 struct gpiodev_private_data
 {
 	char label[20];
+	struct gpio_desc *desc;
 };
 
 struct gpiodrv_private_data
@@ -53,11 +55,17 @@ int gpio_sysfs_probe(struct platform_device *pdev)
 		if (of_property_read_string(child, "label", &name))
 		{
 			dev_warn(dev, "Missing label information");
-			snprintf(dev_data->label, sizeof(dev_data->label), "unkngpio%d", i++);
+			snprintf(dev_data->label, sizeof(dev_data->label), "unkngpio%d", i);
 		} else {
 			strcpy(dev_data->label, name);
 			dev_info(dev, "gpio label = %s\n", dev_data->label);
 		}
+
+		dev_data->desc = devm_fwnode_get_gpiod_from_child(dev, "bone", &child->fwnode, \
+				GPIOD_ASIS, dev_data->label);
+
+		i++;
+
 	}
 	return 0;
 }
