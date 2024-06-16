@@ -124,6 +124,12 @@ int gpio_sysfs_probe(struct platform_device *pdev)
 			return ret;
 		}
 
+		ret = gpiod_direction_output(dev_data->desc, 0);
+		if (ret) {
+			dev_err(dev, "gpio direction output failed\n");
+			return ret;
+		}
+
 		dev_sysfs = device_create_with_groups(gpio_drv_data.class_gpio, dev, 0,\
 				dev_data, gpio_attr_groups, dev_data->label);
 
