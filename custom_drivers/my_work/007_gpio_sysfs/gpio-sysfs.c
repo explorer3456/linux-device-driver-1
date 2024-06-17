@@ -11,31 +11,6 @@
 #include<linux/of_device.h>
 #include <linux/gpio/consumer.h>
 
-static direction_show(struct device *dev, struct device_attribute *attr, char *buf)
-{
-	return 0;
-}
-
-static direction_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
-{
-	return 0;
-}
-
-static value_show(struct device *dev, struct device_attribute *attr, char *buf)
-{
-	return 0;
-}
-
-static value_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
-{
-	return 0;
-}
-
-static label_show(struct device *dev, struct device_attribute *attr, char *buf)
-{
-	return 0;
-}
-
 struct gpiodev_private_data
 {
 	char label[20];
@@ -58,6 +33,75 @@ struct of_device_id gpio_device_match[] =
 	},
 	{}
 };
+
+static direction_show(struct device *dev, struct device_attribute *attr, char *buf)
+{
+	struct gpiodev_private_data *dev_data;
+	int dir;
+	char *direction;
+
+	dev_data = dev_get_drvdata(dev);
+
+	dir = gpiod_get_direction(dev_data->desc);
+
+	if (dir < 0)
+		return dir;
+
+	direction = (dir == 0) ? "out" : "in"; 
+
+	return sprintf(buf, "%s\n", direction);
+}
+
+static direction_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
+{
+	struct gpiodev_private_data *dev_data;
+	int ret;
+
+	dev_data = dev_get_drvdata(dev);
+
+	if (sysfs_streq(buf, "in")){
+		ret = gpiod_direction_input(dev_data->desc);
+	} else if (sysfs_streq(buf, "out")) {
+		ret = gpiod_direction_output(dev_data->desc, 0);
+	} else
+		ret = -EINVAL;
+
+	return ret ? ret : count;
+}
+
+static value_show(struct device *dev, struct device_attribute *attr, char *buf)
+{
+	struct gpiodev_private_data *dev_data = dev_get_drvdata(dev);
+	int value;
+
+	value = gpiod_get_value(dev_data->desc);
+
+	return sprintf(buf, "%d\n", value);
+}
+
+static value_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
+{
+	struct gpiodev_private_data *dev_data = dev_get_drvdata(dev);
+	int ret;
+	long value;
+
+	ret = kstrtol(buf, 0, &value);
+
+	if (ret)
+		return ret;
+
+	gpiod_set_value(dev_data->desc, value);
+
+	return count;
+}
+
+static ssize_t label_show(struct device *dev, struct device_attribute *attr, char *buf)
+{
+	struct gpiodev_private_data *dev_data = dev_get_drvdata(dev);
+
+	return sprintf(buf, "%s\n", dev_data->label);
+}
+
 
 
 static DEVICE_ATTR_RW(direction);
