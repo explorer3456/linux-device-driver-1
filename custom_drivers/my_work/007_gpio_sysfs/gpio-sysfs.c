@@ -21,6 +21,7 @@ struct gpiodrv_private_data
 {
 	int total_devices;
 	struct class *class_gpio;
+	struct device **dev;
 };
 
 struct gpiodrv_private_data gpio_drv_data;
@@ -133,11 +134,20 @@ int gpio_sysfs_probe(struct platform_device *pdev)
 	struct device_node * parent = pdev->dev.of_node;
 	struct device_node * child = NULL;
 	struct gpiodev_private_data *dev_data;
-	struct device *dev_sysfs;
 
 	const char *name;
 	int i = 0;
 	int ret;
+
+	gpio_drv_data.total_devices = of_get_child_count(parent);
+
+	if (gpio_drv_data.total_devices == 0) {
+		dev_err(dev, "No devices\n");
+		return -EINVAL;
+	}
+
+	gpio_drv_data.dev = devm_kzalloc(dev, sizeof(struct device *) * gpio_drv_data.total_devices, \
+			GFP_KERNEL);
 
 	for_each_available_child_of_node(parent, child)
 	{
@@ -174,23 +184,33 @@ int gpio_sysfs_probe(struct platform_device *pdev)
 			return ret;
 		}
 
-		dev_sysfs = device_create_with_groups(gpio_drv_data.class_gpio, dev, 0,\
+		gpio_drv_data.dev[i] = device_create_with_groups(gpio_drv_data.class_gpio, dev, 0,\
 				dev_data, gpio_attr_groups, dev_data->label);
 
-		if (IS_ERR(dev_sysfs)) {
+		if (IS_ERR(gpio_drv_data.dev[i])) {
 			dev_err(dev, "Error in device create\n");
-			return PTR_ERR(dev_sysfs);
+			return PTR_ERR(gpio_drv_data.dev[i]);
 		}
-
 
 		i++;
 
 	}
+
 	return 0;
 }
 
 int gpio_sysfs_remove(struct platform_device *pdev)
 {
+	int i;
+
+	/*
+	   we should test using device_destroy with gpio_class next time.
+	 */
+	dev_info(&pdev->dev, "removing devices\n");
+	for (i=0; i< gpio_drv_data.total_devices; i++) {
+		device_unregister(gpio_drv_data.dev[i]);
+	}
+
 	return 0;
 }
 
