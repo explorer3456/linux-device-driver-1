@@ -1,0 +1,25 @@
+        bone_gpio_devs {
+                compatible = "org,bone-gpio-sysfs";
+              
+                goio1 {
+                        label = "gpio2.2"; // gpio controller 2 of 2
+                        bone-gpios = <&gpio2 2 GPIO_ACTIVE_HIGH>;
+                };  
+                goio2 {
+                        label = "gpio2.3"; // gpio controller 2 of 3.
+                        bone-gpios = <&gpio2 3 GPIO_ACTIVE_HIGH>;
+                };  
+                goio3 {
+                        label = "gpio2.4"; // gpio controller 2 of 4.
+                        bone-gpios = <&gpio2 4 GPIO_ACTIVE_HIGH>;
+                };  
+                goio4 {
+                        label = "usrled0:gpio1.21"; // gpio controller 2 of 4.
+                        bone-gpios = <&gpio1 21 GPIO_ACTIVE_HIGH>;
+                };  
+                goio4 {
+                        label = "usrled1:gpio2.22"; // gpio controller 2 of 4.
+                        bone-gpios = <&gpio1 22 GPIO_ACTIVE_HIGH>;
+                };  
+        }; 
+
