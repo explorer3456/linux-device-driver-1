@@ -1,6 +1,8 @@
         bone_gpio_devs {
                 compatible = "org,bone-gpio-sysfs";
-              
+		pinctrl-names = "default";
+		pinctrl-0 = <&bone_gpio_lcd>;
+
                 goio1 {
                         label = "gpio2.2"; // gpio controller 2 of 2
                         bone-gpios = <&gpio2 2 GPIO_ACTIVE_HIGH>;
@@ -22,4 +24,10 @@
                         bone-gpios = <&gpio1 22 GPIO_ACTIVE_HIGH>;
                 };  
         }; 
+
+&am335x_pinmux {
+	bone_gpio_lcd {
+		pinctrl-single,pins = <AM335X_PADCONF(x,x,x)>;
+	}
+};
 
