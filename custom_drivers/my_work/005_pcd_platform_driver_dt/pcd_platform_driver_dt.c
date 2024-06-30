@@ -10,6 +10,8 @@
 #include<linux/of.h>
 #include<linux/of_device.h>
 #include "platform.h"
+#include <linux/mutex.h>
+#include <linux/spinlock.h>
 
 
 #undef pr_fmt
@@ -60,6 +62,9 @@ struct pcdrv_private_data
 
 /*Driver's private data */
 struct pcdrv_private_data pcdrv_data;
+
+static DEFINE_SPINLOCK(pcd_spin_lock);
+static DEFINE_MUTEX(pcd_mutex_lock);
 
 int check_permission(int dev_perm, int acc_mode)
 {
@@ -126,6 +131,8 @@ ssize_t pcd_read(struct file *filp, char __user *buff, size_t count, loff_t *f_p
 
 	int max_size = pcdev_data->pdata.size;
 
+	mutex_lock(&pcd_mutex_lock);
+
 	pr_info("Read requested for %zu bytes \n",count);
 	pr_info("Current file position = %lld\n",*f_pos);
 
@@ -145,6 +152,8 @@ ssize_t pcd_read(struct file *filp, char __user *buff, size_t count, loff_t *f_p
 	pr_info("Number of bytes successfully read = %zu\n",count);
 	pr_info("Updated file position = %lld\n",*f_pos);
 
+	mutex_unlock(&pcd_mutex_lock);
+
 	/*Return number of bytes which have been successfully read */
 	return count;
 
@@ -155,6 +164,8 @@ ssize_t pcd_write(struct file *filp, const char __user *buff, size_t count, loff
 	struct pcdev_private_data *pcdev_data = (struct pcdev_private_data*)filp->private_data;
 
 	int max_size = pcdev_data->pdata.size;
+
+	mutex_lock(&pcd_mutex_lock);
 	
 	pr_info("Write requested for %zu bytes\n",count);
 	pr_info("Current file position = %lld\n",*f_pos);
@@ -181,6 +192,9 @@ ssize_t pcd_write(struct file *filp, const char __user *buff, size_t count, loff
 	pr_info("Updated file position = %lld\n",*f_pos);
 
 	/*Return number of bytes which have been successfully written */
+
+	mutex_unlock(&pcd_mutex_lock);
+
 	return count;
 
 }
