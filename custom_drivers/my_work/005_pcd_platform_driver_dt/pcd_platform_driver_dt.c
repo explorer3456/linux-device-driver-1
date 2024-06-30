@@ -165,7 +165,8 @@ ssize_t pcd_write(struct file *filp, const char __user *buff, size_t count, loff
 
 	int max_size = pcdev_data->pdata.size;
 
-	mutex_lock(&pcd_mutex_lock);
+	if (mutex_lock_interruptible(&pcd_mutex_lock)) 
+		return -EINTR;
 	
 	pr_info("Write requested for %zu bytes\n",count);
 	pr_info("Current file position = %lld\n",*f_pos);

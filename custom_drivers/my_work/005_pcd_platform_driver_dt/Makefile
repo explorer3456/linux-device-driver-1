@@ -1,6 +1,6 @@
 obj-m := pcd_platform_driver_dt.o
 ARCH=arm
-CROSS_COMPILE=arm-linux-gnueabihf-
+CROSS_COMPILE=arm-linux-gnueabi-
 KERN_DIR = ~/project/udemy/device_driver/workspace/source/linux/
 HOST_KERN_DIR = /lib/modules/$(shell uname -r)/build/
 
