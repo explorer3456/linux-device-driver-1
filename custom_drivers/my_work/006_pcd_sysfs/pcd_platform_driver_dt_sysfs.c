@@ -31,9 +31,15 @@ ssize_t show_serial_num(struct device *dev, struct device_attribute *attr,char *
 {
 	/* get access to the device private data */
 	struct pcdev_private_data *dev_data = dev_get_drvdata(dev->parent);
+	int ret;
 
-	return sprintf(buf,"%s\n",dev_data->pdata.serial_number);
+	mutex_lock(&dev_data->pcd_mutex_lock);
 
+	ret = sprintf(buf,"%s\n",dev_data->pdata.serial_number);
+
+	mutex_unlock(&dev_data->pcd_mutex_lock);
+
+	return ret;
 }
 
 ssize_t show_max_size(struct device *dev, struct device_attribute *attr,char *buf)
@@ -197,6 +203,8 @@ int pcd_platform_driver_probe(struct platform_device *pdev)
 		dev_info(dev,"Cannot allocate memory \n");
 		return -ENOMEM;
 	}
+
+	mutex_init(&dev_data->pcd_mutex_lock);
 
 	/*save the device private data pointer in platform device structure */
 	dev_set_drvdata(&pdev->dev,dev_data);
