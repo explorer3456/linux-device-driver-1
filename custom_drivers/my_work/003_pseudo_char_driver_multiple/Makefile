@@ -1,7 +1,7 @@
 obj-m := pcd_n.o
 ARCH=arm
-CROSS_COMPILE=arm-linux-gnueabihf-
-KERN_DIR = ~/workspace/ldd/source/linux_bbb_4.14/
+CROSS_COMPILE=arm-linux-gnueabi-
+KERN_DIR = ~/project/udemy/device_driver/workspace/source/linux/
 HOST_KERN_DIR = /lib/modules/$(shell uname -r)/build/
 
 all:

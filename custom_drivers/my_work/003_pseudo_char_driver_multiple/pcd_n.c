@@ -4,6 +4,7 @@
 #include<linux/device.h>
 #include<linux/kdev_t.h>
 #include<linux/uaccess.h>
+#include<linux/mutex.h>
 
 
 #undef pr_fmt
@@ -39,6 +40,7 @@ struct pcdev_private_data
 	const char *serial_number;
 	int perm;
 	struct cdev cdev;
+	struct mutex pcd_mutex_lock;
 };
 
 
@@ -286,6 +288,8 @@ static int __init pcd_driver_init(void)
 
 	for(i=0;i<NO_OF_DEVICES;i++){
 		pr_info("Device number <major>:<minor> = %d:%d\n",MAJOR(pcdrv_data.device_number+i),MINOR(pcdrv_data.device_number+i));
+
+		mutex_init(&pcdrv_data.pcdev_data[i].pcd_mutex_lock);
 
 		/*Initialize the cdev structure with fops*/
 		cdev_init(&pcdrv_data.pcdev_data[i].cdev,&pcd_fops);
